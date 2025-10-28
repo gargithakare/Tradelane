@@ -7,6 +7,7 @@ import HomeScreen from './index';
 import StockListScreen from './myStocks';
 import PersonalNewsScreen from './personalNews';
 import PersonalNewsDetailScreen from './personalNewsDetail';
+import { colors } from '../src/utils/theme';
 
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
@@ -42,17 +43,23 @@ export default function RootLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          borderTopColor: '#E5E7EB',
-          backgroundColor: '#FFFFFF',
+          borderTopColor: colors.deep.blue,
+          borderTopWidth: 2,
+          backgroundColor: 'white',
           height: 80,
-          paddingBottom: 10,
-          paddingTop: 10,
+          paddingBottom: 8,
+          paddingTop: 8,
+          shadowColor: colors.primary.dark,
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 12,
         },
-        tabBarActiveTintColor: '#0B63FF',
-        tabBarInactiveTintColor: '#6B7280',
+        tabBarActiveTintColor: colors.accent.teal,
+        tabBarInactiveTintColor: colors.neutral[400],
         tabBarLabelStyle: {
           fontSize: 12,
-          fontWeight: '500',
+          fontWeight: '600',
           marginTop: 4,
         },
       }}
@@ -64,6 +71,7 @@ export default function RootLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home" size={size} color={color} />
           ),
+          tabBarLabel: 'Home',
         }}
       />
       <Tab.Screen
@@ -71,9 +79,9 @@ export default function RootLayout() {
         component={StockListStack}
         options={{
           tabBarIcon: ({ color, size }) => (
-            <Ionicons name="list" size={size} color={color} />
+            <Ionicons name="briefcase" size={size} color={color} />
           ),
-          tabBarLabel: 'Stock List',
+          tabBarLabel: 'Stocks',
         }}
       />
       <Tab.Screen
@@ -83,7 +91,7 @@ export default function RootLayout() {
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="newspaper" size={size} color={color} />
           ),
-          tabBarLabel: 'Personal News',
+          tabBarLabel: 'News',
         }}
       />
     </Tab.Navigator>

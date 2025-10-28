@@ -1,5 +1,6 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, Text, Pressable } from 'react-native';
+import { colors, shadows } from '../utils/theme';
 
 interface StockListItemProps {
   name: string;
@@ -18,22 +19,58 @@ export function StockListItem({
   buyPrice,
   onPress,
 }: StockListItemProps) {
+  const [isPressed, setIsPressed] = useState(false);
   const priceChange = currentPrice - buyPrice;
   const percentChange = ((priceChange / buyPrice) * 100).toFixed(2);
   const isPositive = priceChange >= 0;
 
   return (
-    <Pressable onPress={onPress}>
-      <View className="bg-white rounded-xl p-4 mb-3 border border-gray-100 flex-row items-center justify-between">
+    <Pressable
+      onPress={onPress}
+      onPressIn={() => setIsPressed(true)}
+      onPressOut={() => setIsPressed(false)}
+      style={({ pressed }) => ({
+        opacity: pressed ? 0.7 : 1,
+      })}
+    >
+      <View
+        className={`rounded-md p-4 mb-3 flex-row items-center justify-between border transition-all duration-200 ${
+          isPressed ? 'scale-98' : 'scale-100'
+        }`}
+        style={[
+          {
+            backgroundColor: colors.neutral[50],
+            borderColor: colors.deep.blue,
+            borderWidth: 1,
+            ...shadows.md,
+          }
+        ]}
+      >
         <View className="flex-1">
-          <Text className="text-base font-semibold text-gray-900">{name}</Text>
-          <Text className="text-xs text-gray-500 mt-1">{ticker} • {new Date(dateBought).toLocaleDateString()}</Text>
+          <Text
+            className="font-semibold text-base"
+            style={{ color: colors.primary.dark }}
+          >
+            {name}
+          </Text>
+          <Text
+            className="text-xs mt-2"
+            style={{ color: colors.neutral[500] }}
+          >
+            {ticker} • {new Date(dateBought).toLocaleDateString()}
+          </Text>
         </View>
-        <View className="items-end">
-          <Text className={`text-base font-semibold ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+        <View className="items-end ml-4">
+          <Text
+            className="text-base font-semibold font-mono"
+            style={{ color: isPositive ? colors.status.success : colors.status.error }}
+          >
             {isPositive ? '↑' : '↓'} ${Math.abs(priceChange).toFixed(2)}
           </Text>
-          <Text className={`text-xs ${isPositive ? 'text-green-600' : 'text-red-600'}`}>
+          <Text
+            className="text-xs mt-1"
+            style={{ color: isPositive ? colors.status.success : colors.status.error }}
+          >
             {isPositive ? '+' : ''}{percentChange}%
           </Text>
         </View>
