@@ -41,36 +41,39 @@ export default function PersonalNewsScreen() {
   return (
     <SafeAreaView
       className="flex-1"
-      style={{ backgroundColor: colors.neutral[50] }}
+      style={{ backgroundColor: colors.bg.primary }}
     >
       <View
         style={{
-          height: 100,
-          backgroundColor: colors.primary.dark,
+          height: 120,
+          backgroundColor: colors.bg.secondary,
           paddingHorizontal: 16,
-          paddingTop: 16,
+          paddingTop: 20,
+          paddingBottom: 16,
+          borderBottomColor: colors.border.default,
+          borderBottomWidth: 1,
           ...shadows.lg,
         }}
       >
         <Text
-          className="text-3xl font-bold"
-          style={{ color: 'white' }}
+          className="text-4xl font-bold"
+          style={{ color: colors.text.primary, fontFamily: 'DM Sans' }}
         >
           Personal News
         </Text>
         <Text
           className="text-sm mt-2"
-          style={{ color: colors.highlight.yellow }}
+          style={{ color: colors.accent.hover, fontFamily: 'Inter' }}
         >
           Updates for your stocks
         </Text>
       </View>
 
-      <ScrollView className="flex-1 px-4 py-4">
+      <ScrollView className="flex-1 px-4 py-4" showsVerticalScrollIndicator={false}>
         <View className="pb-8">
           {isLoading ? (
             <View className="items-center justify-center py-8">
-              <Text style={{ color: colors.neutral[500] }}>Loading news...</Text>
+              <Text style={{ color: colors.text.muted, fontFamily: 'Inter' }}>Loading news...</Text>
             </View>
           ) : personalNews.length === 0 ? (
             <View className="items-center justify-center py-12">
@@ -79,23 +82,24 @@ export default function PersonalNewsScreen() {
                   width: 60,
                   height: 60,
                   borderRadius: 30,
-                  backgroundColor: colors.neutral[100],
+                  backgroundColor: colors.bg.secondary,
                   alignItems: 'center',
                   justifyContent: 'center',
                   marginBottom: 12,
+                  ...shadows.md,
                 }}
               >
-                <Ionicons name="newspaper-outline" size={28} color={colors.accent.teal} />
+                <Ionicons name="newspaper-outline" size={28} color={colors.accent.primary} />
               </View>
               <Text
                 className="text-lg font-semibold"
-                style={{ color: colors.primary.dark }}
+                style={{ color: colors.text.primary, fontFamily: 'DM Sans' }}
               >
                 No personalized news
               </Text>
               <Text
                 className="text-sm mt-2"
-                style={{ color: colors.neutral[500] }}
+                style={{ color: colors.text.secondary, fontFamily: 'Inter' }}
               >
                 Add stocks to see relevant news updates
               </Text>
@@ -106,7 +110,7 @@ export default function PersonalNewsScreen() {
                 key={news.id}
                 onPress={() => handleNewsPress(news.id)}
                 style={({ pressed }) => ({
-                  opacity: pressed ? 0.7 : 1,
+                  opacity: pressed ? 0.8 : 1,
                 })}
                 className="mb-4"
               >
@@ -114,9 +118,9 @@ export default function PersonalNewsScreen() {
                   className="rounded-lg p-5 border"
                   style={[
                     {
-                      backgroundColor: 'white',
-                      borderColor: colors.deep.blue,
-                      borderWidth: 1.5,
+                      backgroundColor: colors.bg.secondary,
+                      borderColor: colors.border.default,
+                      borderWidth: 1,
                       ...shadows.lg,
                     }
                   ]}
@@ -127,26 +131,26 @@ export default function PersonalNewsScreen() {
                         width: 4,
                         height: 4,
                         borderRadius: 2,
-                        backgroundColor: colors.accent.teal,
+                        backgroundColor: colors.accent.primary,
                         marginBottom: 8,
                       }}
                     />
                   </View>
                   <Text
                     className="text-sm font-semibold mb-2"
-                    style={{ color: colors.accent.teal }}
+                    style={{ color: colors.accent.hover, fontFamily: 'Inter' }}
                   >
                     {news.nameOfStock}
                   </Text>
                   <Text
                     className="text-base font-semibold mb-2"
-                    style={{ color: colors.primary.dark }}
+                    style={{ color: colors.text.primary, fontFamily: 'DM Sans' }}
                   >
                     {news.headline}
                   </Text>
                   <Text
                     className="text-xs"
-                    style={{ color: colors.neutral[400] }}
+                    style={{ color: colors.text.muted, fontFamily: 'Inter' }}
                   >
                     {new Date(news.date).toLocaleDateString()}
                   </Text>

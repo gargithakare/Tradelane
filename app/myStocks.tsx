@@ -61,35 +61,35 @@ export default function StockListScreen() {
   return (
     <SafeAreaView
       className="flex-1"
-      style={{ backgroundColor: colors.neutral[50] }}
+      style={{ backgroundColor: colors.bg.primary }}
     >
       <View
-        className="border-b px-4 py-4"
+        className="px-4 py-5 border-b"
         style={{
-          backgroundColor: 'white',
-          borderColor: colors.deep.blue,
-          borderWidth: 1,
-          ...shadows.md,
+          backgroundColor: colors.bg.secondary,
+          borderColor: colors.border.default,
+          borderBottomWidth: 1,
+          ...shadows.lg,
         }}
       >
         <Text
-          className="text-3xl font-bold mb-4"
-          style={{ color: colors.primary.dark }}
+          className="text-4xl font-bold mb-4"
+          style={{ color: colors.text.primary, fontFamily: 'DM Sans' }}
         >
           My Stocks
         </Text>
 
         <View className="flex-row items-center gap-3">
           <View
-            className="flex-1 flex-row items-center rounded-md px-3 py-3 border-2"
+            className="flex-1 flex-row items-center rounded-lg px-3 py-3 border-2"
             style={[
               {
-                backgroundColor: colors.neutral[50],
-                borderColor: searchFocused ? colors.accent.teal : colors.deep.blue,
+                backgroundColor: colors.bg.tertiary,
+                borderColor: searchFocused ? colors.accent.hover : colors.accent.primary,
               }
             ]}
           >
-            <Ionicons name="search" size={18} color={colors.accent.teal} />
+            <Ionicons name="search" size={18} color={colors.accent.primary} />
             <TextInput
               placeholder="Search stocks…"
               value={searchQuery}
@@ -97,27 +97,27 @@ export default function StockListScreen() {
               onFocus={() => setSearchFocused(true)}
               onBlur={() => setSearchFocused(false)}
               className="flex-1 ml-2 text-base"
-              placeholderTextColor={colors.neutral[400]}
-              style={{ color: colors.primary.dark }}
+              placeholderTextColor={colors.text.muted}
+              style={{ color: colors.text.primary, fontFamily: 'Inter' }}
             />
           </View>
           <Pressable
             onPress={() => setModalVisible(true)}
-            className="rounded-md px-4 py-3 items-center justify-center"
+            className="rounded-lg px-4 py-3 items-center justify-center"
             style={{
-              backgroundColor: colors.accent.teal,
-              ...shadows.md,
+              backgroundColor: colors.accent.primary,
+              ...shadows.tealglow,
             }}
           >
-            <Ionicons name="add" size={22} color="white" />
+            <Ionicons name="add" size={22} color={colors.text.primary} />
           </Pressable>
         </View>
       </View>
 
-      <ScrollView className="flex-1 px-4 py-4">
+      <ScrollView className="flex-1 px-4 py-4" showsVerticalScrollIndicator={false}>
         {isLoading ? (
           <View className="items-center justify-center py-8">
-            <Text style={{ color: colors.neutral[500] }}>Loading stocks...</Text>
+            <Text style={{ color: colors.text.muted, fontFamily: 'Inter' }}>Loading stocks...</Text>
           </View>
         ) : filteredStocks.length === 0 ? (
           <View className="items-center justify-center py-12">
@@ -126,23 +126,24 @@ export default function StockListScreen() {
                 width: 60,
                 height: 60,
                 borderRadius: 30,
-                backgroundColor: colors.neutral[100],
+                backgroundColor: colors.bg.secondary,
                 alignItems: 'center',
                 justifyContent: 'center',
                 marginBottom: 12,
+                ...shadows.md,
               }}
             >
-              <Ionicons name="briefcase-outline" size={28} color={colors.accent.teal} />
+              <Ionicons name="briefcase-outline" size={28} color={colors.accent.primary} />
             </View>
             <Text
               className="text-lg font-semibold"
-              style={{ color: colors.primary.dark }}
+              style={{ color: colors.text.primary, fontFamily: 'DM Sans' }}
             >
               {searchQuery ? 'No stocks found' : 'No stocks added yet'}
             </Text>
             <Text
               className="text-sm mt-2"
-              style={{ color: colors.neutral[500] }}
+              style={{ color: colors.text.secondary, fontFamily: 'Inter' }}
             >
               {searchQuery ? 'Try a different search' : 'Add your first stock to get started'}
             </Text>

@@ -5,39 +5,39 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        // Primary Dark Blue
-        'primary-dark': '#000B58',
-        'primary-dark-light': '#001a7f',
+        // Midnight Teal - Backgrounds
+        'bg-primary': '#0A0E1A',
+        'bg-secondary': '#111827',
+        'bg-tertiary': '#1a2332',
 
-        // Deep Blue
-        'deep-blue': '#003161',
-        'deep-blue-light': '#004580',
+        // Accent colors - Teal
+        'accent-primary': '#00B8A9',
+        'accent-hover': '#00E0C6',
+        'accent-dark': '#008B7F',
 
-        // Teal Green (accent)
-        'teal-accent': '#006A67',
-        'teal-accent-light': '#008c89',
-        'teal-accent-dark': '#004d4b',
+        // Status colors
+        'success': '#4ADE80',
+        'error': '#F87171',
+        'warning': '#FBBF24',
+        'info': '#3B82F6',
 
-        // Soft Yellow (highlight)
-        'yellow-soft': '#FFF4B7',
-        'yellow-bright': '#FFEB99',
+        // Text colors
+        'text-primary': '#F1F5F9',
+        'text-secondary': '#9BA3B0',
+        'text-muted': '#6B7280',
 
-        // Neutral grays
-        'neutral-50': '#F9FAFB',
-        'neutral-100': '#F3F4F6',
-        'neutral-200': '#E5E7EB',
-        'neutral-300': '#D1D5DB',
-        'neutral-400': '#9CA3AF',
-        'neutral-500': '#6B7280',
-        'neutral-600': '#4B5563',
-        'neutral-700': '#374151',
-        'neutral-800': '#1F2937',
-        'neutral-900': '#111827',
+        // Highlights
+        'yellow-glow': '#FFE28A',
+
+        // Borders
+        'border-default': '#1F2937',
+        'border-light': '#2D3748',
       },
       fontFamily: {
-        poppins: ['Poppins', 'system-ui', 'sans-serif'],
         inter: ['Inter', 'system-ui', 'sans-serif'],
-        'mono': ['Monaco', 'monospace'],
+        poppins: ['Poppins', 'system-ui', 'sans-serif'],
+        dmSans: ['DM Sans', 'system-ui', 'sans-serif'],
+        mono: ['Monaco', 'monospace'],
       },
       fontSize: {
         xs: ['12px', '16px'],
@@ -66,11 +66,14 @@ module.exports = {
       },
       shadowColor: '#000000',
       boxShadow: {
-        xs: '0 1px 2px 0 rgba(0, 0, 0, 0.05)',
-        sm: '0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06)',
-        md: '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        lg: '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
-        xl: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+        xs: '0 1px 3px rgba(0, 0, 0, 0.3)',
+        sm: '0 2px 4px rgba(0, 0, 0, 0.4)',
+        md: '0 4px 8px rgba(0, 0, 0, 0.5)',
+        lg: '0 8px 16px rgba(0, 0, 0, 0.6)',
+        xl: '0 12px 20px rgba(0, 0, 0, 0.7)',
+        'teal-glow': '0 0 12px rgba(0, 184, 169, 0.3)',
+        'teal-glow-hover': '0 0 16px rgba(0, 224, 198, 0.4)',
+        'yellow-glow': '0 0 8px rgba(255, 226, 138, 0.2)',
       },
       transitionDuration: {
         fast: '200ms',

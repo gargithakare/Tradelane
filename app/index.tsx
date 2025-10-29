@@ -11,32 +11,35 @@ export default function HomeScreen() {
   return (
     <SafeAreaView
       className="flex-1"
-      style={{ backgroundColor: colors.neutral[50] }}
+      style={{ backgroundColor: colors.bg.primary }}
     >
       <View
         style={{
-          height: 100,
-          backgroundColor: colors.primary.dark,
+          height: 120,
+          backgroundColor: colors.bg.secondary,
           paddingHorizontal: 16,
-          paddingTop: 16,
+          paddingTop: 20,
+          paddingBottom: 16,
+          borderBottomColor: colors.border.default,
+          borderBottomWidth: 1,
           ...shadows.lg,
         }}
       >
         <Text
-          className="text-3xl font-bold"
-          style={{ color: 'white' }}
+          className="text-4xl font-bold"
+          style={{ color: colors.text.primary, fontFamily: 'DM Sans' }}
         >
           Global News
         </Text>
         <Text
           className="text-sm mt-2"
-          style={{ color: colors.highlight.yellow }}
+          style={{ color: colors.accent.hover, fontFamily: 'Inter' }}
         >
           Latest market updates & insights
         </Text>
       </View>
 
-      <ScrollView className="flex-1 px-4 py-4">
+      <ScrollView className="flex-1 px-4 py-4" showsVerticalScrollIndicator={false}>
         <View className="pb-8">
           {mockNewsData.map((news) => (
             <NewsCard

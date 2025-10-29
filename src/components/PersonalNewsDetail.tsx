@@ -20,15 +20,16 @@ export function PersonalNewsDetail({
   return (
     <ScrollView
       className="flex-1"
-      style={{ backgroundColor: colors.neutral[50] }}
+      style={{ backgroundColor: colors.bg.primary }}
+      showsVerticalScrollIndicator={false}
     >
       <View className="m-4">
         <View
           className="rounded-lg p-5 border"
           style={[
             {
-              backgroundColor: 'white',
-              borderColor: colors.deep.blue,
+              backgroundColor: colors.bg.secondary,
+              borderColor: colors.accent.teal,
               borderWidth: 1.5,
               ...shadows.lg,
             }
@@ -48,19 +49,19 @@ export function PersonalNewsDetail({
                 paddingHorizontal: 8,
                 paddingVertical: 4,
                 backgroundColor: colors.highlight.yellow,
-                borderRadius: 4,
+                borderRadius: 6,
               }}
             >
               <Text
                 className="text-xs font-semibold"
-                style={{ color: colors.primary.dark }}
+                style={{ color: colors.bg.primary, fontFamily: 'Poppins' }}
               >
                 {ticker}
               </Text>
             </View>
             <Text
               className="text-sm font-semibold"
-              style={{ color: colors.accent.teal }}
+              style={{ color: colors.accent.tealLight, fontFamily: 'Poppins' }}
             >
               {nameOfStock}
             </Text>
@@ -68,21 +69,21 @@ export function PersonalNewsDetail({
 
           <Text
             className="text-2xl font-bold mb-3"
-            style={{ color: colors.primary.dark }}
+            style={{ color: colors.text.primary, fontFamily: 'Poppins' }}
           >
             {headline}
           </Text>
 
           <Text
             className="text-xs mb-5"
-            style={{ color: colors.neutral[500] }}
+            style={{ color: colors.text.tertiary, fontFamily: 'Poppins' }}
           >
             {new Date(date).toLocaleDateString()}
           </Text>
 
           <View
             style={{
-              backgroundColor: colors.neutral[50],
+              backgroundColor: colors.bg.primary,
               borderRadius: 8,
               padding: 16,
               borderLeftWidth: 4,
@@ -92,8 +93,9 @@ export function PersonalNewsDetail({
             <Text
               className="text-base"
               style={{
-                color: colors.neutral[700],
+                color: colors.text.secondary,
                 lineHeight: 24,
+                fontFamily: 'Poppins',
               }}
             >
               {newsContent}

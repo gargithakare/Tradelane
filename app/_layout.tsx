@@ -17,6 +17,10 @@ function StockListStack() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
+        cardStyle: { backgroundColor: colors.bg.primary },
+        animationEnabled: true,
+        animationTypeForReplace: 'pop',
+        gestureEnabled: true,
       }}
     >
       <Stack.Screen name="StockListScreen" component={StockListScreen} />
@@ -29,6 +33,10 @@ function PersonalNewsStack() {
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
+        cardStyle: { backgroundColor: colors.bg.primary },
+        animationEnabled: true,
+        animationTypeForReplace: 'pop',
+        gestureEnabled: true,
       }}
     >
       <Stack.Screen name="PersonalNewsScreen" component={PersonalNewsScreen} />
@@ -43,24 +51,25 @@ export default function RootLayout() {
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          borderTopColor: colors.deep.blue,
+          borderTopColor: colors.accent.teal,
           borderTopWidth: 2,
-          backgroundColor: 'white',
+          backgroundColor: colors.bg.secondary,
           height: 80,
           paddingBottom: 8,
           paddingTop: 8,
-          shadowColor: colors.primary.dark,
-          shadowOffset: { width: 0, height: -2 },
-          shadowOpacity: 0.1,
-          shadowRadius: 8,
-          elevation: 12,
+          shadowColor: colors.accent.teal,
+          shadowOffset: { width: 0, height: -4 },
+          shadowOpacity: 0.3,
+          shadowRadius: 12,
+          elevation: 16,
         },
         tabBarActiveTintColor: colors.accent.teal,
-        tabBarInactiveTintColor: colors.neutral[400],
+        tabBarInactiveTintColor: colors.text.tertiary,
         tabBarLabelStyle: {
           fontSize: 12,
           fontWeight: '600',
           marginTop: 4,
+          fontFamily: 'Poppins',
         },
       }}
     >

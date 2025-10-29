@@ -18,7 +18,7 @@ export function NewsCard({ headline, summary, date, onPress }: NewsCardProps) {
       onPressIn={() => setIsPressed(true)}
       onPressOut={() => setIsPressed(false)}
       style={({ pressed }) => ({
-        opacity: pressed ? 0.7 : 1,
+        opacity: pressed ? 0.8 : 1,
       })}
       className="mb-4"
     >
@@ -26,39 +26,39 @@ export function NewsCard({ headline, summary, date, onPress }: NewsCardProps) {
         className="rounded-lg p-5 transition-all duration-300 border"
         style={[
           {
-            backgroundColor: isPressed ? colors.neutral[100] : 'white',
-            borderColor: colors.deep.blue,
+            backgroundColor: colors.bg.secondary,
+            borderColor: isPressed ? colors.accent.tealLight : colors.accent.teal,
             borderWidth: 1.5,
             ...shadows.lg,
           }
         ]}
       >
-        <View style={{ marginBottom: 8 }}>
+        <View style={{ marginBottom: 12 }}>
           <View
             style={{
               width: 4,
               height: 4,
               borderRadius: 2,
-              backgroundColor: colors.accent.teal,
+              backgroundColor: colors.accent.tealLight,
               marginBottom: 8,
             }}
           />
         </View>
         <Text
           className="text-lg font-semibold"
-          style={{ color: colors.primary.dark }}
+          style={{ color: colors.text.primary, fontFamily: 'Poppins' }}
         >
           {headline}
         </Text>
         <Text
           className="text-sm mt-2"
-          style={{ color: colors.neutral[600], lineHeight: 20 }}
+          style={{ color: colors.text.secondary, lineHeight: 20, fontFamily: 'Poppins' }}
         >
           {summary}
         </Text>
         <Text
           className="text-xs mt-3"
-          style={{ color: colors.neutral[400] }}
+          style={{ color: colors.text.tertiary, fontFamily: 'Poppins' }}
         >
           {new Date(date).toLocaleDateString()}
         </Text>

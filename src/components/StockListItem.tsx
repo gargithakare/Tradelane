@@ -1,5 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, Pressable } from 'react-native';
+import Animated, {
+  useSharedValue,
+  useAnimatedStyle,
+  withSpring,
+  Easing,
+  withTiming,
+} from 'react-native-reanimated';
 import { colors, shadows } from '../utils/theme';
 
 interface StockListItemProps {
@@ -19,62 +26,85 @@ export function StockListItem({
   buyPrice,
   onPress,
 }: StockListItemProps) {
-  const [isPressed, setIsPressed] = useState(false);
+  const scale = useSharedValue(1);
   const priceChange = currentPrice - buyPrice;
   const percentChange = ((priceChange / buyPrice) * 100).toFixed(2);
   const isPositive = priceChange >= 0;
 
+  const handlePressIn = () => {
+    scale.value = withSpring(0.98, {
+      damping: 10,
+      mass: 1,
+      stiffness: 120,
+    });
+  };
+
+  const handlePressOut = () => {
+    scale.value = withSpring(1, {
+      damping: 10,
+      mass: 1,
+      stiffness: 120,
+    });
+  };
+
+  const animatedStyle = useAnimatedStyle(() => ({
+    transform: [{ scale: scale.value }],
+  }));
+
   return (
-    <Pressable
-      onPress={onPress}
-      onPressIn={() => setIsPressed(true)}
-      onPressOut={() => setIsPressed(false)}
-      style={({ pressed }) => ({
-        opacity: pressed ? 0.7 : 1,
-      })}
-    >
-      <View
-        className={`rounded-md p-4 mb-3 flex-row items-center justify-between border transition-all duration-200 ${
-          isPressed ? 'scale-98' : 'scale-100'
-        }`}
-        style={[
-          {
-            backgroundColor: colors.neutral[50],
-            borderColor: colors.deep.blue,
-            borderWidth: 1,
-            ...shadows.md,
-          }
-        ]}
+    <Animated.View style={[animatedStyle, { marginBottom: 12 }]}>
+      <Pressable
+        onPress={onPress}
+        onPressIn={handlePressIn}
+        onPressOut={handlePressOut}
       >
-        <View className="flex-1">
-          <Text
-            className="font-semibold text-base"
-            style={{ color: colors.primary.dark }}
-          >
-            {name}
-          </Text>
-          <Text
-            className="text-xs mt-2"
-            style={{ color: colors.neutral[500] }}
-          >
-            {ticker} • {new Date(dateBought).toLocaleDateString()}
-          </Text>
+        <View
+          className="rounded-lg p-4 flex-row items-center justify-between border"
+          style={[
+            {
+              backgroundColor: colors.bg.secondary,
+              borderColor: colors.border.default,
+              borderWidth: 1,
+              ...shadows.md,
+            }
+          ]}
+        >
+          <View className="flex-1">
+            <Text
+              className="font-semibold text-base"
+              style={{ color: colors.text.primary, fontFamily: 'DM Sans' }}
+            >
+              {name}
+            </Text>
+            <Text
+              className="text-xs mt-2"
+              style={{ color: colors.text.secondary, fontFamily: 'Inter' }}
+            >
+              {ticker} • {new Date(dateBought).toLocaleDateString()}
+            </Text>
+          </View>
+          <View className="items-end ml-4">
+            <Text
+              className="text-base font-semibold"
+              style={{
+                color: isPositive ? colors.status.positive : colors.status.negative,
+                fontFamily: 'Inter',
+              }}
+            >
+              {isPositive ? '+' : ''} ${Math.abs(priceChange).toFixed(2)}
+            </Text>
+            <Text
+              className="text-xs mt-1"
+              style={{
+                color: isPositive ? colors.status.positive : colors.status.negative,
+                fontFamily: 'Inter',
+              }}
+            >
+              {isPositive ? '+' : ''}{percentChange}%
+            </Text>
+          </View>
         </View>
-        <View className="items-end ml-4">
-          <Text
-            className="text-base font-semibold font-mono"
-            style={{ color: isPositive ? colors.status.success : colors.status.error }}
-          >
-            {isPositive ? '↑' : '↓'} ${Math.abs(priceChange).toFixed(2)}
-          </Text>
-          <Text
-            className="text-xs mt-1"
-            style={{ color: isPositive ? colors.status.success : colors.status.error }}
-          >
-            {isPositive ? '+' : ''}{percentChange}%
-          </Text>
-        </View>
-      </View>
-    </Pressable>
+      </Pressable>
+    </Animated.View>
   );
 }

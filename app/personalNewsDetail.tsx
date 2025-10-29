@@ -15,25 +15,23 @@ export default function PersonalNewsDetailScreen() {
   return (
     <SafeAreaView
       className="flex-1"
-      style={{ backgroundColor: colors.neutral[50] }}
+      style={{ backgroundColor: colors.bg.primary }}
     >
       <View
         className="border-b px-4 py-3 flex-row items-center justify-between"
         style={{
-          backgroundColor: 'white',
-          borderColor: colors.deep.blue,
+          backgroundColor: colors.bg.secondary,
+          borderColor: colors.border.default,
           borderWidth: 1,
           ...shadows.md,
         }}
       >
-        <Pressable onPress={() => navigation.goBack()}
-          className="p-2"
-        >
-          <Ionicons name="chevron-back" size={24} color={colors.accent.teal} />
+        <Pressable onPress={() => navigation.goBack()} className="p-2">
+          <Ionicons name="chevron-back" size={24} color={colors.accent.primary} />
         </Pressable>
         <Text
           className="text-lg font-bold flex-1 ml-4"
-          style={{ color: colors.primary.dark }}
+          style={{ color: colors.text.primary, fontFamily: 'DM Sans' }}
         >
           Details
         </Text>

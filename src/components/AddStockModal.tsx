@@ -18,10 +18,24 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
   
   const scrollViewRef = useRef<ScrollView>(null);
   const translateY = useRef(new Animated.Value(0)).current;
-  const keyboardListenerRef = useRef<any>(null);
+  const scaleAnim = useRef(new Animated.Value(0.9)).current;
+  const opacityAnim = useRef(new Animated.Value(0)).current;
 
   useEffect(() => {
     if (!visible) return;
+
+    Animated.parallel([
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacityAnim, {
+        toValue: 1,
+        duration: 300,
+        useNativeDriver: true,
+      }),
+    ]).start();
 
     const keyboardWillShow = Keyboard.addListener(
       Platform.OS === 'ios' ? 'keyboardWillShow' : 'keyboardDidShow',
@@ -55,7 +69,7 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
       keyboardWillShow.remove();
       keyboardWillHide.remove();
     };
-  }, [visible, translateY]);
+  }, [visible, translateY, scaleAnim, opacityAnim]);
 
   const handleDateChange = (event: any, selectedDate?: Date) => {
     if (Platform.OS === 'android') {
@@ -93,7 +107,23 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
     setDateBought(new Date());
     setNameInputFocused(false);
     Keyboard.dismiss();
-    onClose();
+    
+    Animated.parallel([
+      Animated.timing(scaleAnim, {
+        toValue: 0.9,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacityAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      onClose();
+      scaleAnim.setValue(0.9);
+      opacityAnim.setValue(0);
+    });
   };
 
   const handleCancel = () => {
@@ -101,21 +131,37 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
     setDateBought(new Date());
     setNameInputFocused(false);
     Keyboard.dismiss();
-    onClose();
+    
+    Animated.parallel([
+      Animated.timing(scaleAnim, {
+        toValue: 0.9,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+      Animated.timing(opacityAnim, {
+        toValue: 0,
+        duration: 200,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      onClose();
+      scaleAnim.setValue(0.9);
+      opacityAnim.setValue(0);
+    });
   };
 
   return (
     <>
       <Modal visible={visible && showModalContent} transparent animationType="slide">
-      <TouchableOpacity
-  onPress={handleCancel}
-  style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0, 11, 88, 0.5)' }}
-  activeOpacity={1}
->
-
+        <TouchableOpacity
+          onPress={handleCancel}
+          style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0, 11, 88, 0.8)' }}
+          activeOpacity={1}
+        >
           <Animated.View
             style={{
-              transform: [{ translateY }],
+              transform: [{ translateY }, { scale: scaleAnim }],
+              opacity: opacityAnim,
               flex: 0,
             }}
           >
@@ -128,26 +174,27 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
                 showsVerticalScrollIndicator={false}
               >
                 <View
-                  className="rounded-t-2xl p-6 pt-4"
+                  className="rounded-t-3xl p-6 pt-4"
                   style={{
-                    backgroundColor: 'white',
+                    backgroundColor: colors.bg.secondary,
                     ...shadows.xl,
                   }}
                 >
                   <View
                     style={{
-                      width: 40,
+                      width: 50,
                       height: 4,
                       borderRadius: 2,
-                      backgroundColor: colors.deep.blue,
+                      backgroundColor: colors.accent.teal,
                       marginHorizontal: 'auto',
-                      marginBottom: 20,
+                      marginBottom: 24,
+                      ...shadows.tealglow,
                     }}
                   />
 
                   <Text
-                    className="text-2xl font-bold mb-6"
-                    style={{ color: colors.primary.dark }}
+                    className="text-3xl font-bold mb-6"
+                    style={{ color: colors.text.primary, fontFamily: 'Poppins' }}
                   >
                     Add Stock
                   </Text>
@@ -155,7 +202,7 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
                   <View className="mb-5">
                     <Text
                       className="text-sm font-semibold mb-2"
-                      style={{ color: colors.primary.dark }}
+                      style={{ color: colors.text.secondary, fontFamily: 'Poppins' }}
                     >
                       Stock Name
                     </Text>
@@ -165,15 +212,17 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
                       onChangeText={setStockName}
                       onFocus={() => setNameInputFocused(true)}
                       onBlur={() => setNameInputFocused(false)}
-                      className="rounded-md px-4 py-3 text-base"
-                      placeholderTextColor={colors.neutral[400]}
+                      className="rounded-lg px-4 py-4 text-base"
+                      placeholderTextColor={colors.text.muted}
                       style={[
                         {
-                          backgroundColor: colors.neutral[50],
+                          backgroundColor: colors.bg.tertiary,
                           borderWidth: 2,
-                          borderColor: nameInputFocused ? colors.accent.teal : colors.deep.blue,
-                          color: colors.primary.dark,
-                        }
+                          borderColor: nameInputFocused ? colors.accent.tealLight : colors.accent.teal,
+                          color: colors.text.primary,
+                          fontFamily: 'Poppins',
+                        },
+                        nameInputFocused && shadows.tealglow,
                       ]}
                     />
                   </View>
@@ -181,24 +230,23 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
                   <View className="mb-6">
                     <Text
                       className="text-sm font-semibold mb-2"
-                      style={{ color: colors.primary.dark }}
+                      style={{ color: colors.text.secondary, fontFamily: 'Poppins' }}
                     >
                       Date Bought
                     </Text>
                     <Pressable
                       onPress={handleOpenDatePicker}
-                      className="rounded-md px-4 py-3 flex-row items-center justify-between"
+                      className="rounded-lg px-4 py-4 flex-row items-center justify-between border-2"
                       style={[
                         {
-                          backgroundColor: colors.neutral[50],
-                          borderWidth: 2,
-                          borderColor: colors.deep.blue,
+                          backgroundColor: colors.bg.tertiary,
+                          borderColor: colors.accent.teal,
                         }
                       ]}
                     >
                       <Text
                         className="text-base"
-                        style={{ color: colors.primary.dark }}
+                        style={{ color: colors.text.primary, fontFamily: 'Poppins' }}
                       >
                         {dateBought.toLocaleDateString()}
                       </Text>
@@ -208,12 +256,12 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
 
                   {showDatePicker && Platform.OS === 'ios' && (
                     <View
-                      className="mb-4 rounded-md overflow-hidden"
+                      className="mb-4 rounded-lg overflow-hidden border"
                       style={[
                         {
-                          backgroundColor: colors.neutral[100],
-                          borderWidth: 1,
-                          borderColor: colors.deep.blue,
+                          backgroundColor: colors.bg.tertiary,
+                          borderColor: colors.accent.teal,
+                          borderWidth: 2,
                         }
                       ]}
                     >
@@ -222,37 +270,43 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
                         mode="date"
                         display="spinner"
                         onChange={handleDateChange}
-                        textColor={colors.primary.dark}
+                        textColor={colors.text.primary}
                       />
                       <Pressable
                         onPress={handleCloseDatePicker}
                         className="py-3 items-center"
-                        style={{ backgroundColor: colors.accent.teal }}
+                        style={{ 
+                          backgroundColor: colors.accent.teal,
+                          ...shadows.tealglow,
+                        }}
                       >
-                        <Text className="text-white font-semibold">Done</Text>
+                        <Text className="text-white font-semibold" style={{ fontFamily: 'Poppins' }}>Done</Text>
                       </Pressable>
                     </View>
                   )}
 
-                  <View className="flex-row gap-3 pt-6 pb-2 border-t" style={{ borderColor: colors.neutral[200] }}>
+                  <View className="flex-row gap-3 pt-6 pb-2 border-t" style={{ borderColor: colors.bg.tertiary }}>
                     <Pressable
                       onPress={handleCancel}
-                      className="flex-1 rounded-md py-3 items-center border-2"
-                      style={{ borderColor: colors.neutral[400] }}
+                      className="flex-1 rounded-lg py-4 items-center border-2"
+                      style={{ borderColor: colors.highlight.yellow }}
                     >
                       <Text
                         className="text-base font-semibold"
-                        style={{ color: colors.neutral[600] }}
+                        style={{ color: colors.highlight.yellow, fontFamily: 'Poppins' }}
                       >
                         Cancel
                       </Text>
                     </Pressable>
                     <Pressable
                       onPress={handleAdd}
-                      className="flex-1 rounded-md py-3 items-center"
-                      style={{ backgroundColor: colors.accent.teal }}
+                      className="flex-1 rounded-lg py-4 items-center"
+                      style={{ 
+                        backgroundColor: colors.accent.teal,
+                        ...shadows.tealglow,
+                      }}
                     >
-                      <Text className="text-base font-semibold text-white">
+                      <Text className="text-base font-semibold text-white" style={{ fontFamily: 'Poppins' }}>
                         Add Stock
                       </Text>
                     </Pressable>
@@ -262,7 +316,6 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
             </TouchableWithoutFeedback>
           </Animated.View>
         </TouchableOpacity>
-
       </Modal>
 
       {showDatePicker && Platform.OS === 'android' && (
