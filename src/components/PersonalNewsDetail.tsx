@@ -1,6 +1,34 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { colors, shadows } from '../utils/theme';
+import axios from 'axios';
+
+
+// const personalNewsObject = 
+//   {
+//     symbol: "TEAMLEASE",
+//     "desc": "Analysts/Institutional Investor Meet/Con. Call Updates",
+//     "dt": "16102025164915",
+//     "attchmntFile": "https://nsearchives.nseindia.com/corporate/TEAMLEASE_16102025164702_TeamLeaseIntimationofConcallonQ2FY26.pdf",
+//     "sm_name": "Teamlease Services Limited",
+//     "sm_isin": "INE985S01024",
+//     "an_dt": "16-Oct-2025 16:49:15",
+//     "sort_date": "2025-10-16 16:49:15",
+//     "seq_id": "106409849",
+//     "smIndustry": null,
+//     "orgid": null,
+//     "attchmntText": "Conference Call with Investors on Q2 FY26 Results",
+//     "bflag": null,
+//     "old_new": null,
+//     "csvName": null,
+//     "exchdisstime": "16-Oct-2025 16:49:16",
+//     "difference": "00:00:01",
+//     "fileSize": "3.74 MB",
+//     "attFileSize": "3.74 MB",
+//     "hasXbrl": true
+// }
+
+
 
 interface PersonalNewsDetailProps {
   nameOfStock: string;
@@ -10,6 +38,29 @@ interface PersonalNewsDetailProps {
   newsContent: string;
 }
 
+interface ResponseObject {
+  symbol: string;
+  desc: string;
+  dt: string;
+  attchmntFile: string;
+  sm_name: string;
+  sm_isin: string;
+  an_dt: string;
+  sort_date: string;
+  seq_id: string;
+  smIndustry: string | null;
+  orgid: string | null;
+  attchmntText: string;
+  bflag: string | null;
+  old_new: string | null;
+  csvName: string | null;
+  exchdisstime: string;
+  difference: string;
+  fileSize: string;
+  attFileSize: string;
+  hasXbrl: boolean;
+}
+
 export function PersonalNewsDetail({
   nameOfStock,
   ticker,
@@ -17,6 +68,41 @@ export function PersonalNewsDetail({
   date,
   newsContent,
 }: PersonalNewsDetailProps) {
+  const [personalNewsObject, setPersonalNewsObject] = useState<ResponseObject[]>([]);
+
+  
+
+  // useEffect(() => {
+  //   axios.get('localhost:3000/api/announcements/TCS')
+  //     .then(response => {
+  //       const data = response.data;
+  //       setPersonalNewsObject(Array.isArray(data) ? data : [data]);
+  //     })
+  //     .catch(err => console.error("Error fetching:", err));
+  // }, []);
+  
+  useEffect(() => {
+    console.log(" useEffect triggered");
+
+    async function fetchResponse() {
+      try {
+        const response = await axios.get('http://localhost:3000/api/announcements/TCS');
+        console.log("Response data:", response.data);
+        setPersonalNewsObject(Array.isArray(response.data) ? response.data : [response.data]);
+      } catch (error) {
+        console.error("Axios error:", error);
+      } finally {
+        console.log("useEffect completed");
+      }      
+    }
+  
+    fetchResponse();
+  }, []);
+  
+
+  console.log("personalNewsObject", personalNewsObject)
+  
+
   return (
     <ScrollView
       className="flex-1"
@@ -52,18 +138,22 @@ export function PersonalNewsDetail({
                 borderRadius: 6,
               }}
             >
+              {/* SYMBOL */}
               <Text
                 className="text-xs font-semibold"
                 style={{ color: colors.bg.primary, fontFamily: 'Poppins' }}
               >
-                {ticker}
+                {/* {ticker}   */}
+                {personalNewsObject[0]?.symbol}
               </Text>
             </View>
+            {/* stock name  */}
             <Text
               className="text-sm font-semibold"
               style={{ color: colors.accent.tealLight, fontFamily: 'Poppins' }}
             >
-              {nameOfStock}
+              {/* {nameOfStock} */}
+              {personalNewsObject[0]?.sm_name}
             </Text>
           </View>
 
@@ -71,14 +161,16 @@ export function PersonalNewsDetail({
             className="text-2xl font-bold mb-3"
             style={{ color: colors.text.primary, fontFamily: 'Poppins' }}
           >
-            {headline}
+            {/* {headline} */}
+            {personalNewsObject[0]?.desc}
           </Text>
 
           <Text
             className="text-xs mb-5"
             style={{ color: colors.text.tertiary, fontFamily: 'Poppins' }}
           >
-            {new Date(date).toLocaleDateString()}
+            {/* {new Date(date).toLocaleDateString()} */}
+            {/* {newsDate} */}  DATE
           </Text>
 
           <View
@@ -98,7 +190,8 @@ export function PersonalNewsDetail({
                 fontFamily: 'Poppins',
               }}
             >
-              {newsContent}
+              {/* {newsContent} */}
+              {personalNewsObject[0]?.attchmntText}
             </Text>
           </View>
         </View>

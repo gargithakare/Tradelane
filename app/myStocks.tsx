@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Text, View, TextInput, ScrollView, SafeAreaView, Pressable, FlatList } from 'react-native';
+import { Text, View, TextInput, ScrollView, SafeAreaView, Pressable, FlatList, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import '../global.css';
 import { StockListItem } from '../src/components/StockListItem';
@@ -70,6 +70,7 @@ export default function StockListScreen() {
   };
 
   const handleEditStock = () => {
+    console.log('handleEditStock called. SelectedStock:', selectedStock);
     setStockOptionsModalVisible(false);
     setEditMode(true);
     setModalVisible(true);
@@ -81,28 +82,57 @@ export default function StockListScreen() {
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedStock) return;
+    if (!selectedStock) {
+      console.log('No stock selected for deletion');
+      Alert.alert('Error', 'No stock selected');
+      return;
+    }
 
-    const updatedStocks = await deleteStock(selectedStock.id);
-    setStocks(updatedStocks);
-    setFilteredStocks(updatedStocks);
-    setSelectedStock(null);
-    setDeleteConfirmationVisible(false);
+    try {
+      console.log('Deleting stock:', selectedStock.id, selectedStock.name);
+      const updatedStocks = await deleteStock(selectedStock.id);
+      console.log('Updated stocks after delete:', updatedStocks);
+      console.log('Old stocks count:', stocks.length, 'New stocks count:', updatedStocks.length);
+
+      setStocks(updatedStocks);
+      setFilteredStocks(updatedStocks);
+      setSelectedStock(null);
+      setDeleteConfirmationVisible(false);
+
+      Alert.alert('Success', 'Stock deleted successfully');
+    } catch (error) {
+      console.error('Error deleting stock:', error);
+      Alert.alert('Error', 'Failed to delete stock');
+    }
   };
 
   const handleEditStockSave = async (stockName: string, dateBought: string) => {
-    if (!selectedStock) return;
+    if (!selectedStock) {
+      console.log('No stock selected for editing');
+      Alert.alert('Error', 'No stock selected');
+      return;
+    }
 
-    const updatedStocks = await updateStock(selectedStock.id, {
-      name: stockName,
-      ticker: stockName.substring(0, 4).toUpperCase(),
-      dateBought,
-    });
-    setStocks(updatedStocks);
-    setFilteredStocks(updatedStocks);
-    setSelectedStock(null);
-    setEditMode(false);
-    setModalVisible(false);
+    try {
+      console.log('Editing stock:', selectedStock.id, 'New name:', stockName, 'New date:', dateBought);
+      const updatedStocks = await updateStock(selectedStock.id, {
+        name: stockName,
+        ticker: stockName.substring(0, 4).toUpperCase(),
+        dateBought,
+      });
+      console.log('Updated stocks after edit:', updatedStocks);
+
+      setStocks(updatedStocks);
+      setFilteredStocks(updatedStocks);
+      setSelectedStock(null);
+      setEditMode(false);
+      setModalVisible(false);
+
+      Alert.alert('Success', 'Stock updated successfully');
+    } catch (error) {
+      console.error('Error updating stock:', error);
+      Alert.alert('Error', 'Failed to update stock');
+    }
   };
 
   const handleCloseAllModals = () => {

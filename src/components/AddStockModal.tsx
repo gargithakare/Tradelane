@@ -22,10 +22,8 @@ export function AddStockModal({
   initialDateBought = '',
   onEdit,
 }: AddStockModalProps) {
-  const [stockName, setStockName] = useState(initialStockName);
-  const [dateBought, setDateBought] = useState<Date>(
-    initialDateBought ? new Date(initialDateBought) : new Date()
-  );
+  const [stockName, setStockName] = useState('');
+  const [dateBought, setDateBought] = useState<Date>(new Date());
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showModalContent, setShowModalContent] = useState(true);
   const [nameInputFocused, setNameInputFocused] = useState(false);
@@ -37,11 +35,23 @@ export function AddStockModal({
 
   useEffect(() => {
     if (visible) {
-      setStockName(initialStockName || '');
-      setDateBought(initialDateBought ? new Date(initialDateBought) : new Date());
+      console.log('Modal visible. Mode:', mode, 'InitialStockName:', initialStockName, 'InitialDateBought:', initialDateBought);
+      // Apply initial values for edit mode, or reset for add mode
+      if (mode === 'edit' && initialStockName) {
+        setStockName(initialStockName);
+      } else {
+        setStockName('');
+      }
+
+      if (mode === 'edit' && initialDateBought) {
+        setDateBought(new Date(initialDateBought));
+      } else {
+        setDateBought(new Date());
+      }
+
       setNameInputFocused(false);
     }
-  }, [visible, initialStockName, initialDateBought]);
+  }, [visible, initialStockName, initialDateBought, mode]);
 
   useEffect(() => {
     if (!visible) return;
@@ -125,14 +135,21 @@ export function AddStockModal({
       return;
     }
 
+    console.log('HandleAdd called. Mode:', mode, 'Name:', stockName, 'Date:', dateBought.toISOString().split('T')[0]);
+
     if (mode === 'edit' && onEdit) {
+      console.log('Calling onEdit callback');
       onEdit(stockName, dateBought.toISOString().split('T')[0]);
     } else {
+      console.log('Calling onAdd callback');
       onAdd(stockName, dateBought.toISOString().split('T')[0]);
     }
 
-    setStockName('');
-    setDateBought(new Date());
+    // Reset only for add mode, not for edit
+    if (mode !== 'edit') {
+      setStockName('');
+      setDateBought(new Date());
+    }
     setNameInputFocused(false);
     Keyboard.dismiss();
 

@@ -4,7 +4,6 @@ import {
   Text,
   Modal,
   Pressable,
-  TouchableWithoutFeedback,
   Animated,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
@@ -73,8 +72,12 @@ export function DeleteConfirmationModal({
   };
 
   const handleConfirm = () => {
+    console.log('Delete confirmed from modal');
     handleClose();
-    setTimeout(() => onConfirm(), 200);
+    setTimeout(() => {
+      console.log('Calling onConfirm callback');
+      onConfirm();
+    }, 200);
   };
 
   return (
@@ -88,89 +91,86 @@ export function DeleteConfirmationModal({
           alignItems: 'center',
           padding: 16,
         }}
-        activeOpacity={1}
       >
-        <TouchableWithoutFeedback onPress={(e) => e.stopPropagation?.()}>
-          <Animated.View
+        <Animated.View
+          style={{
+            transform: [
+              { scale: scaleAnim },
+              { translateY: translateY },
+            ],
+            opacity: opacityAnim,
+            width: '100%',
+            maxWidth: 300,
+          }}
+        >
+          <View
+            className="rounded-3xl p-6"
             style={{
-              transform: [
-                { scale: scaleAnim },
-                { translateY: translateY },
-              ],
-              opacity: opacityAnim,
-              width: '100%',
-              maxWidth: 300,
+              backgroundColor: '#121212',
+              ...shadows.xl,
             }}
           >
-            <View
-              className="rounded-3xl p-6"
-              style={{
-                backgroundColor: '#121212',
-                ...shadows.xl,
-              }}
-            >
-              <View className="items-center mb-4">
-                <View
-                  className="rounded-full items-center justify-center mb-3"
-                  style={{
-                    width: 56,
-                    height: 56,
-                    backgroundColor: 'rgba(255, 76, 76, 0.1)',
-                  }}
-                >
-                  <Ionicons name="warning" size={28} color="#FF4C4C" />
-                </View>
-              </View>
-
-              <Text
-                className="text-lg font-bold text-center mb-2"
-                style={{ color: colors.text.primary, fontFamily: 'Poppins' }}
+            <View className="items-center mb-4">
+              <View
+                className="rounded-full items-center justify-center mb-3"
+                style={{
+                  width: 56,
+                  height: 56,
+                  backgroundColor: 'rgba(255, 76, 76, 0.1)',
+                }}
               >
-                Are you sure you want to delete this stock?
-              </Text>
-
-              <Text
-                className="text-sm text-center mb-6"
-                style={{ color: colors.text.secondary, fontFamily: 'Inter' }}
-              >
-                This action cannot be undone.
-              </Text>
-
-              <View className="gap-3">
-                <Pressable
-                  onPress={handleConfirm}
-                  className="rounded-lg px-4 py-4 items-center"
-                  style={{
-                    backgroundColor: '#FF4C4C',
-                    ...shadows.md,
-                  }}
-                >
-                  <Text
-                    className="text-base font-bold"
-                    style={{ color: 'white', fontFamily: 'Poppins' }}
-                  >
-                    Yes, Delete
-                  </Text>
-                </Pressable>
-
-                <Pressable
-                  onPress={handleClose}
-                  className="rounded-lg px-4 py-4 items-center"
-                  style={{
-                    backgroundColor: '#2C2C2E',
-                  }}
-                >
-                  <Text
-                    className="text-base font-semibold"
-                    style={{ color: colors.text.secondary, fontFamily: 'Poppins' }}
-                  >
-                    No, Cancel
-                  </Text>
-                </Pressable>
+                <Ionicons name="warning" size={28} color="#FF4C4C" />
               </View>
             </View>
-          </Animated.View>
-        </TouchableWithoutFeedback>
+
+            <Text
+              className="text-lg font-bold text-center mb-2"
+              style={{ color: colors.text.primary, fontFamily: 'Poppins' }}
+            >
+              Are you sure you want to delete this stock?
+            </Text>
+
+            <Text
+              className="text-sm text-center mb-6"
+              style={{ color: colors.text.secondary, fontFamily: 'Inter' }}
+            >
+              This action cannot be undone.
+            </Text>
+
+            <View className="gap-3">
+              <Pressable
+                onPress={handleConfirm}
+                className="rounded-lg px-4 py-4 items-center"
+                style={{
+                  backgroundColor: '#FF4C4C',
+                  ...shadows.md,
+                }}
+              >
+                <Text
+                  className="text-base font-bold"
+                  style={{ color: 'white', fontFamily: 'Poppins' }}
+                >
+                  Yes, Delete
+                </Text>
+              </Pressable>
+
+              <Pressable
+                onPress={handleClose}
+                className="rounded-lg px-4 py-4 items-center"
+                style={{
+                  backgroundColor: '#2C2C2E',
+                }}
+              >
+                <Text
+                  className="text-base font-semibold"
+                  style={{ color: colors.text.secondary, fontFamily: 'Poppins' }}
+                >
+                  No, Cancel
+                </Text>
+              </Pressable>
+            </View>
+          </View>
+        </Animated.View>
       </Pressable>
     </Modal>
   );
