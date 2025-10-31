@@ -1,34 +1,9 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView } from 'react-native';
-import { colors, shadows } from '../utils/theme';
-import axios from 'axios';
-
-
-// const personalNewsObject = 
-//   {
-//     symbol: "TEAMLEASE",
-//     "desc": "Analysts/Institutional Investor Meet/Con. Call Updates",
-//     "dt": "16102025164915",
-//     "attchmntFile": "https://nsearchives.nseindia.com/corporate/TEAMLEASE_16102025164702_TeamLeaseIntimationofConcallonQ2FY26.pdf",
-//     "sm_name": "Teamlease Services Limited",
-//     "sm_isin": "INE985S01024",
-//     "an_dt": "16-Oct-2025 16:49:15",
-//     "sort_date": "2025-10-16 16:49:15",
-//     "seq_id": "106409849",
-//     "smIndustry": null,
-//     "orgid": null,
-//     "attchmntText": "Conference Call with Investors on Q2 FY26 Results",
-//     "bflag": null,
-//     "old_new": null,
-//     "csvName": null,
-//     "exchdisstime": "16-Oct-2025 16:49:16",
-//     "difference": "00:00:01",
-//     "fileSize": "3.74 MB",
-//     "attFileSize": "3.74 MB",
-//     "hasXbrl": true
-// }
-
-
+import React, { useEffect, useState } from "react";
+import { View, Text, ScrollView } from "react-native";
+import { colors, shadows } from "../utils/theme";
+import axios from "axios";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 interface PersonalNewsDetailProps {
   nameOfStock: string;
@@ -68,40 +43,51 @@ export function PersonalNewsDetail({
   date,
   newsContent,
 }: PersonalNewsDetailProps) {
-  const [personalNewsObject, setPersonalNewsObject] = useState<ResponseObject[]>([]);
+  const queryClient = useQueryClient();
+  const { isPending, isError, data, error } = useQuery({
+    queryKey: ["stockDetail"],
+    queryFn: fetchResponse,
+    staleTime: Infinity
+  });
 
-  
+  const [personalNewsObject, setPersonalNewsObject] = useState<
+    ResponseObject[]
+  >([]);
 
-  // useEffect(() => {
-  //   axios.get('localhost:3000/api/announcements/TCS')
-  //     .then(response => {
-  //       const data = response.data;
-  //       setPersonalNewsObject(Array.isArray(data) ? data : [data]);
-  //     })
-  //     .catch(err => console.error("Error fetching:", err));
-  // }, []);
-  
-  useEffect(() => {
-    console.log(" useEffect triggered");
-
-    async function fetchResponse() {
-      try {
-        const response = await axios.get('http://localhost:3000/api/announcements/TCS');
-        console.log("Response data:", response.data);
-        setPersonalNewsObject(Array.isArray(response.data) ? response.data : [response.data]);
-      } catch (error) {
-        console.error("Axios error:", error);
-      } finally {
-        console.log("useEffect completed");
-      }      
+  async function fetchResponse() {
+    try {
+      const response = await axios.get(
+        "http://192.168.29.169:3000/api/announcements/TCS"
+      );
+      console.log("Response data:", response.data);
+      setPersonalNewsObject(
+        Array.isArray(response.data) ? response.data : [response.data]
+      );
+      return response.data;
+    } catch (error) {
+      console.error("Axios error:", error);
+    } finally {
+      console.log("useEffect completed");
     }
-  
-    fetchResponse();
-  }, []);
-  
+  }
 
-  console.log("personalNewsObject", personalNewsObject)
-  
+  // TODO: display a skeleton loader
+  if (isPending) {
+    return (
+      <SafeAreaView>
+        <Text>Loading...</Text>
+      </SafeAreaView>
+    );
+  }
+
+  // TODO: display a proper error component
+  if (isError) {
+    return (
+      <SafeAreaView>
+        <Text>An error has occured.</Text>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <ScrollView
@@ -118,14 +104,14 @@ export function PersonalNewsDetail({
               borderColor: colors.accent.teal,
               borderWidth: 1.5,
               ...shadows.lg,
-            }
+            },
           ]}
         >
           <View
             style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
               gap: 8,
               marginBottom: 12,
             }}
@@ -141,7 +127,7 @@ export function PersonalNewsDetail({
               {/* SYMBOL */}
               <Text
                 className="text-xs font-semibold"
-                style={{ color: colors.bg.primary, fontFamily: 'Poppins' }}
+                style={{ color: colors.bg.primary, fontFamily: "Poppins" }}
               >
                 {/* {ticker}   */}
                 {personalNewsObject[0]?.symbol}
@@ -150,7 +136,7 @@ export function PersonalNewsDetail({
             {/* stock name  */}
             <Text
               className="text-sm font-semibold"
-              style={{ color: colors.accent.tealLight, fontFamily: 'Poppins' }}
+              style={{ color: colors.accent.tealLight, fontFamily: "Poppins" }}
             >
               {/* {nameOfStock} */}
               {personalNewsObject[0]?.sm_name}
@@ -159,7 +145,7 @@ export function PersonalNewsDetail({
 
           <Text
             className="text-2xl font-bold mb-3"
-            style={{ color: colors.text.primary, fontFamily: 'Poppins' }}
+            style={{ color: colors.text.primary, fontFamily: "Poppins" }}
           >
             {/* {headline} */}
             {personalNewsObject[0]?.desc}
@@ -167,10 +153,9 @@ export function PersonalNewsDetail({
 
           <Text
             className="text-xs mb-5"
-            style={{ color: colors.text.tertiary, fontFamily: 'Poppins' }}
+            style={{ color: colors.text.tertiary, fontFamily: "Poppins" }}
           >
-            {/* {new Date(date).toLocaleDateString()} */}
-            {/* {newsDate} */}  DATE
+            {}
           </Text>
 
           <View
@@ -187,7 +172,7 @@ export function PersonalNewsDetail({
               style={{
                 color: colors.text.secondary,
                 lineHeight: 24,
-                fontFamily: 'Poppins',
+                fontFamily: "Poppins",
               }}
             >
               {/* {newsContent} */}
