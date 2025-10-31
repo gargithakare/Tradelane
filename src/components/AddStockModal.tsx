@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { View, Text, TextInput, Pressable, Modal, Alert, Platform, Keyboard, Animated, ScrollView, TouchableWithoutFeedback, TouchableOpacity } from 'react-native';
+import { View, Text, TextInput, Pressable, Modal, Alert, Platform, Keyboard, Animated, ScrollView } from 'react-native';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { colors, shadows } from '../utils/theme';
 
@@ -7,11 +7,25 @@ interface AddStockModalProps {
   visible: boolean;
   onClose: () => void;
   onAdd: (stockName: string, dateBought: string) => void;
+  mode?: 'add' | 'edit';
+  initialStockName?: string;
+  initialDateBought?: string;
+  onEdit?: (stockName: string, dateBought: string) => void;
 }
 
-export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
-  const [stockName, setStockName] = useState('');
-  const [dateBought, setDateBought] = useState<Date>(new Date());
+export function AddStockModal({
+  visible,
+  onClose,
+  onAdd,
+  mode = 'add',
+  initialStockName = '',
+  initialDateBought = '',
+  onEdit,
+}: AddStockModalProps) {
+  const [stockName, setStockName] = useState(initialStockName);
+  const [dateBought, setDateBought] = useState<Date>(
+    initialDateBought ? new Date(initialDateBought) : new Date()
+  );
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showModalContent, setShowModalContent] = useState(true);
   const [nameInputFocused, setNameInputFocused] = useState(false);
@@ -20,6 +34,14 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
   const translateY = useRef(new Animated.Value(0)).current;
   const scaleAnim = useRef(new Animated.Value(0.9)).current;
   const opacityAnim = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    if (visible) {
+      setStockName(initialStockName || '');
+      setDateBought(initialDateBought ? new Date(initialDateBought) : new Date());
+      setNameInputFocused(false);
+    }
+  }, [visible, initialStockName, initialDateBought]);
 
   useEffect(() => {
     if (!visible) return;
@@ -102,12 +124,18 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
       Alert.alert('Error', 'Please enter a stock name');
       return;
     }
-    onAdd(stockName, dateBought.toISOString().split('T')[0]);
+
+    if (mode === 'edit' && onEdit) {
+      onEdit(stockName, dateBought.toISOString().split('T')[0]);
+    } else {
+      onAdd(stockName, dateBought.toISOString().split('T')[0]);
+    }
+
     setStockName('');
     setDateBought(new Date());
     setNameInputFocused(false);
     Keyboard.dismiss();
-    
+
     Animated.parallel([
       Animated.timing(scaleAnim, {
         toValue: 0.9,
@@ -153,10 +181,9 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
   return (
     <>
       <Modal visible={visible && showModalContent} transparent animationType="slide">
-        <TouchableOpacity
+        <Pressable
           onPress={handleCancel}
           style={{ flex: 1, justifyContent: 'flex-end', backgroundColor: 'rgba(0, 11, 88, 0.8)' }}
-          activeOpacity={1}
         >
           <Animated.View
             style={{
@@ -165,8 +192,7 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
               flex: 0,
             }}
           >
-            <TouchableWithoutFeedback onPress={(e) => e.stopPropagation?.()}>
-              <ScrollView
+            <ScrollView
                 ref={scrollViewRef}
                 scrollEnabled={true}
                 contentContainerStyle={{ flexGrow: 1 }}
@@ -196,7 +222,7 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
                     className="text-3xl font-bold mb-6"
                     style={{ color: colors.text.primary, fontFamily: 'Poppins' }}
                   >
-                    Add Stock
+                    {mode === 'edit' ? 'Edit Stock' : 'Add Stock'}
                   </Text>
 
                   <View className="mb-5">
@@ -301,21 +327,20 @@ export function AddStockModal({ visible, onClose, onAdd }: AddStockModalProps) {
                     <Pressable
                       onPress={handleAdd}
                       className="flex-1 rounded-lg py-4 items-center"
-                      style={{ 
+                      style={{
                         backgroundColor: colors.accent.teal,
                         ...shadows.tealglow,
                       }}
                     >
                       <Text className="text-base font-semibold text-white" style={{ fontFamily: 'Poppins' }}>
-                        Add Stock
+                        {mode === 'edit' ? 'Edit Stock' : 'Add Stock'}
                       </Text>
                     </Pressable>
                   </View>
                 </View>
               </ScrollView>
-            </TouchableWithoutFeedback>
           </Animated.View>
-        </TouchableOpacity>
+        </Pressable>
       </Modal>
 
       {showDatePicker && Platform.OS === 'android' && (

@@ -9,6 +9,8 @@ import Animated, {
 } from 'react-native-reanimated';
 import { colors, shadows } from '../utils/theme';
 
+import { Stock } from '../data/mockStocks';
+
 interface StockListItemProps {
   name: string;
   ticker: string;
@@ -16,6 +18,8 @@ interface StockListItemProps {
   currentPrice: number;
   buyPrice: number;
   onPress?: () => void;
+  onLongPress?: () => void;
+  stock?: Stock;
 }
 
 export function StockListItem({
@@ -25,6 +29,8 @@ export function StockListItem({
   currentPrice,
   buyPrice,
   onPress,
+  onLongPress,
+  stock,
 }: StockListItemProps) {
   const scale = useSharedValue(1);
   const priceChange = currentPrice - buyPrice;
@@ -55,6 +61,7 @@ export function StockListItem({
     <Animated.View style={[animatedStyle, { marginBottom: 12 }]}>
       <Pressable
         onPress={onPress}
+        onLongPress={onLongPress}
         onPressIn={handlePressIn}
         onPressOut={handlePressOut}
       >

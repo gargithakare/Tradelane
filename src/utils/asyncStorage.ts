@@ -33,6 +33,20 @@ export async function addStock(stock: Stock): Promise<Stock[]> {
   }
 }
 
+export async function updateStock(stockId: string, updates: Partial<Stock>): Promise<Stock[]> {
+  try {
+    const stocks = await getStoredStocks();
+    const newStocks = stocks.map((s) =>
+      s.id === stockId ? { ...s, ...updates } : s
+    );
+    await saveStocks(newStocks);
+    return newStocks;
+  } catch (error) {
+    console.error('Error updating stock:', error);
+    return [];
+  }
+}
+
 export async function deleteStock(stockId: string): Promise<Stock[]> {
   try {
     const stocks = await getStoredStocks();

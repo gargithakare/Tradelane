@@ -27,7 +27,8 @@ export function NewsCard({ headline, summary, date, onPress }: NewsCardProps) {
         style={[
           {
             backgroundColor: colors.bg.secondary,
-            borderColor: isPressed ? colors.accent.tealLight : colors.accent.teal,
+            // borderColor: isPressed ? colors.accent.tealLight : colors.accent.teal,
+            borderColor: colors.border.default,
             borderWidth: 1.5,
             ...shadows.lg,
           }

@@ -4,7 +4,9 @@ import { Ionicons } from '@expo/vector-icons';
 import '../global.css';
 import { StockListItem } from '../src/components/StockListItem';
 import { AddStockModal } from '../src/components/AddStockModal';
-import { getStoredStocks, addStock } from '../src/utils/asyncStorage';
+import { StockOptionsModal } from '../src/components/StockOptionsModal';
+import { DeleteConfirmationModal } from '../src/components/DeleteConfirmationModal';
+import { getStoredStocks, addStock, updateStock, deleteStock } from '../src/utils/asyncStorage';
 import { defaultMockStocks, Stock } from '../src/data/mockStocks';
 import { colors, shadows } from '../src/utils/theme';
 
@@ -15,6 +17,10 @@ export default function StockListScreen() {
   const [modalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [searchFocused, setSearchFocused] = useState(false);
+  const [stockOptionsModalVisible, setStockOptionsModalVisible] = useState(false);
+  const [deleteConfirmationVisible, setDeleteConfirmationVisible] = useState(false);
+  const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
+  const [editMode, setEditMode] = useState(false);
 
   useEffect(() => {
     loadStocks();
@@ -56,6 +62,53 @@ export default function StockListScreen() {
     const updatedStocks = await addStock(newStock);
     setStocks(updatedStocks);
     setFilteredStocks(updatedStocks);
+  };
+
+  const handleOpenStockOptions = (stock: Stock) => {
+    setSelectedStock(stock);
+    setStockOptionsModalVisible(true);
+  };
+
+  const handleEditStock = () => {
+    setStockOptionsModalVisible(false);
+    setEditMode(true);
+    setModalVisible(true);
+  };
+
+  const handleDeleteStock = () => {
+    setStockOptionsModalVisible(false);
+    setDeleteConfirmationVisible(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    if (!selectedStock) return;
+
+    const updatedStocks = await deleteStock(selectedStock.id);
+    setStocks(updatedStocks);
+    setFilteredStocks(updatedStocks);
+    setSelectedStock(null);
+    setDeleteConfirmationVisible(false);
+  };
+
+  const handleEditStockSave = async (stockName: string, dateBought: string) => {
+    if (!selectedStock) return;
+
+    const updatedStocks = await updateStock(selectedStock.id, {
+      name: stockName,
+      ticker: stockName.substring(0, 4).toUpperCase(),
+      dateBought,
+    });
+    setStocks(updatedStocks);
+    setFilteredStocks(updatedStocks);
+    setSelectedStock(null);
+    setEditMode(false);
+    setModalVisible(false);
+  };
+
+  const handleCloseAllModals = () => {
+    setModalVisible(false);
+    setEditMode(false);
+    setSelectedStock(null);
   };
 
   return (
@@ -158,6 +211,9 @@ export default function StockListScreen() {
                 dateBought={stock.dateBought}
                 currentPrice={stock.currentPrice}
                 buyPrice={stock.buyPrice}
+                stock={stock}
+                onPress={() => handleOpenStockOptions(stock)}
+                onLongPress={() => handleOpenStockOptions(stock)}
               />
             ))}
           </View>
@@ -165,9 +221,36 @@ export default function StockListScreen() {
       </ScrollView>
 
       <AddStockModal
-        visible={modalVisible}
+        visible={modalVisible && !editMode}
         onClose={() => setModalVisible(false)}
         onAdd={handleAddStock}
+      />
+
+      <AddStockModal
+        visible={editMode && modalVisible}
+        mode="edit"
+        initialStockName={selectedStock?.name}
+        initialDateBought={selectedStock?.dateBought}
+        onClose={handleCloseAllModals}
+        onEdit={handleEditStockSave}
+        onAdd={() => {}}
+      />
+
+      <StockOptionsModal
+        visible={stockOptionsModalVisible}
+        stockName={selectedStock?.name || ''}
+        onClose={() => {
+          setStockOptionsModalVisible(false);
+          setSelectedStock(null);
+        }}
+        onEdit={handleEditStock}
+        onDelete={handleDeleteStock}
+      />
+
+      <DeleteConfirmationModal
+        visible={deleteConfirmationVisible}
+        onClose={() => setDeleteConfirmationVisible(false)}
+        onConfirm={handleConfirmDelete}
       />
     </SafeAreaView>
   );
