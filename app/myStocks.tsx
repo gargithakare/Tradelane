@@ -1,26 +1,72 @@
-import React, { useState, useEffect } from 'react';
-import { Text, View, TextInput, ScrollView, SafeAreaView, Pressable, FlatList, Alert } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import '../global.css';
-import { StockListItem } from '../src/components/StockListItem';
-import { AddStockModal } from '../src/components/AddStockModal';
-import { StockOptionsModal } from '../src/components/StockOptionsModal';
-import { DeleteConfirmationModal } from '../src/components/DeleteConfirmationModal';
-import { getStoredStocks, addStock, updateStock, deleteStock } from '../src/utils/asyncStorage';
-import { defaultMockStocks, Stock } from '../src/data/mockStocks';
-import { colors, shadows } from '../src/utils/theme';
+import React, { useState, useEffect } from "react";
+import {
+  Text,
+  View,
+  TextInput,
+  ScrollView,
+  SafeAreaView,
+  Pressable,
+  Alert,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import "../global.css";
+import { StockListItem } from "../src/components/StockListItem";
+import { AddStockModal } from "../src/components/AddStockModal";
+import { StockOptionsModal } from "../src/components/StockOptionsModal";
+import { DeleteConfirmationModal } from "../src/components/DeleteConfirmationModal";
+import {
+  getStoredStocks,
+  addStock,
+  updateStock,
+  deleteStock,
+} from "../src/utils/asyncStorage";
+import { defaultMockStocks, Stock } from "../src/data/mockStocks";
+import { colors, shadows } from "../src/utils/theme";
+
+import { useNavigation } from "@react-navigation/native";
+import type { StackNavigationProp } from "@react-navigation/stack";
+import type { NavigatorScreenParams } from "@react-navigation/native";
+
+// ✅ Define stack types
+export type PersonalNewsStackParamList = {
+  PersonalNewsScreen: { stock: Stock };
+  PersonalNewsDetailScreen: {
+    news: {
+      nameOfStock: string;
+      ticker: string;
+      headline: string;
+      date: string;
+      newsContent: string;
+    };
+  };
+};
+
+export type RootStackParamList = {
+  StockListScreen: undefined;
+  PersonalNews: NavigatorScreenParams<PersonalNewsStackParamList>;
+};
+
+// ✅ Navigation prop
+type StockListScreenNavigationProp = StackNavigationProp<
+  RootStackParamList,
+  "StockListScreen"
+>;
 
 export default function StockListScreen() {
   const [stocks, setStocks] = useState<Stock[]>([]);
   const [filteredStocks, setFilteredStocks] = useState<Stock[]>([]);
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState("");
   const [modalVisible, setModalVisible] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
   const [searchFocused, setSearchFocused] = useState(false);
-  const [stockOptionsModalVisible, setStockOptionsModalVisible] = useState(false);
-  const [deleteConfirmationVisible, setDeleteConfirmationVisible] = useState(false);
+  const [stockOptionsModalVisible, setStockOptionsModalVisible] =
+    useState(false);
+  const [deleteConfirmationVisible, setDeleteConfirmationVisible] =
+    useState(false);
   const [selectedStock, setSelectedStock] = useState<Stock | null>(null);
   const [editMode, setEditMode] = useState(false);
+
+  const navigation = useNavigation<StockListScreenNavigationProp>();
 
   useEffect(() => {
     loadStocks();
@@ -29,16 +75,16 @@ export default function StockListScreen() {
   const loadStocks = async () => {
     setIsLoading(true);
     const storedStocks = await getStoredStocks();
-    const allStocks = storedStocks.length > 0 ? storedStocks : defaultMockStocks;
+    const allStocks =
+      storedStocks.length > 0 ? storedStocks : defaultMockStocks;
     setStocks(allStocks);
     setFilteredStocks(allStocks);
     setIsLoading(false);
   };
 
   useEffect(() => {
-    if (searchQuery.trim() === '') {
-      setFilteredStocks(stocks);
-    } else {
+    if (searchQuery.trim() === "") setFilteredStocks(stocks);
+    else {
       const filtered = stocks.filter(
         (stock) =>
           stock.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -58,7 +104,6 @@ export default function StockListScreen() {
       buyPrice: 100,
       quantity: 1,
     };
-
     const updatedStocks = await addStock(newStock);
     setStocks(updatedStocks);
     setFilteredStocks(updatedStocks);
@@ -70,7 +115,6 @@ export default function StockListScreen() {
   };
 
   const handleEditStock = () => {
-    console.log('handleEditStock called. SelectedStock:', selectedStock);
     setStockOptionsModalVisible(false);
     setEditMode(true);
     setModalVisible(true);
@@ -82,63 +126,17 @@ export default function StockListScreen() {
   };
 
   const handleConfirmDelete = async () => {
-    if (!selectedStock) {
-      console.log('No stock selected for deletion');
-      Alert.alert('Error', 'No stock selected');
-      return;
-    }
-
+    if (!selectedStock) return Alert.alert("Error", "No stock selected");
     try {
-      console.log('Deleting stock:', selectedStock.id, selectedStock.name);
       const updatedStocks = await deleteStock(selectedStock.id);
-      console.log('Updated stocks after delete:', updatedStocks);
-      console.log('Old stocks count:', stocks.length, 'New stocks count:', updatedStocks.length);
-
       setStocks(updatedStocks);
       setFilteredStocks(updatedStocks);
       setSelectedStock(null);
       setDeleteConfirmationVisible(false);
-
-      Alert.alert('Success', 'Stock deleted successfully');
-    } catch (error) {
-      console.error('Error deleting stock:', error);
-      Alert.alert('Error', 'Failed to delete stock');
+      Alert.alert("Success", "Stock deleted successfully");
+    } catch {
+      Alert.alert("Error", "Failed to delete stock");
     }
-  };
-
-  const handleEditStockSave = async (stockName: string, dateBought: string) => {
-    if (!selectedStock) {
-      console.log('No stock selected for editing');
-      Alert.alert('Error', 'No stock selected');
-      return;
-    }
-
-    try {
-      console.log('Editing stock:', selectedStock.id, 'New name:', stockName, 'New date:', dateBought);
-      const updatedStocks = await updateStock(selectedStock.id, {
-        name: stockName,
-        ticker: stockName.substring(0, 4).toUpperCase(),
-        dateBought,
-      });
-      console.log('Updated stocks after edit:', updatedStocks);
-
-      setStocks(updatedStocks);
-      setFilteredStocks(updatedStocks);
-      setSelectedStock(null);
-      setEditMode(false);
-      setModalVisible(false);
-
-      Alert.alert('Success', 'Stock updated successfully');
-    } catch (error) {
-      console.error('Error updating stock:', error);
-      Alert.alert('Error', 'Failed to update stock');
-    }
-  };
-
-  const handleCloseAllModals = () => {
-    setModalVisible(false);
-    setEditMode(false);
-    setSelectedStock(null);
   };
 
   return (
@@ -151,13 +149,12 @@ export default function StockListScreen() {
         style={{
           backgroundColor: colors.bg.secondary,
           borderColor: colors.border.default,
-          borderBottomWidth: 1,
           ...shadows.lg,
         }}
       >
         <Text
           className="text-4xl font-bold mb-4"
-          style={{ color: colors.text.primary, fontFamily: 'DM Sans' }}
+          style={{ color: colors.text.primary }}
         >
           My Stocks
         </Text>
@@ -165,12 +162,12 @@ export default function StockListScreen() {
         <View className="flex-row items-center gap-3">
           <View
             className="flex-1 flex-row items-center rounded-lg px-3 py-3 border-2"
-            style={[
-              {
-                backgroundColor: colors.bg.tertiary,
-                borderColor: searchFocused ? colors.accent.hover : colors.accent.primary,
-              }
-            ]}
+            style={{
+              backgroundColor: colors.bg.tertiary,
+              borderColor: searchFocused
+                ? colors.accent.hover
+                : colors.accent.primary,
+            }}
           >
             <Ionicons name="search" size={18} color={colors.accent.primary} />
             <TextInput
@@ -181,7 +178,7 @@ export default function StockListScreen() {
               onBlur={() => setSearchFocused(false)}
               className="flex-1 ml-2 text-base"
               placeholderTextColor={colors.text.muted}
-              style={{ color: colors.text.primary, fontFamily: 'Inter' }}
+              style={{ color: colors.text.primary }}
             />
           </View>
           <Pressable
@@ -197,57 +194,25 @@ export default function StockListScreen() {
         </View>
       </View>
 
-      <ScrollView className="flex-1 px-4 py-4" showsVerticalScrollIndicator={false}>
-        {isLoading ? (
-          <View className="items-center justify-center py-8">
-            <Text style={{ color: colors.text.muted, fontFamily: 'Inter' }}>Loading stocks...</Text>
-          </View>
-        ) : filteredStocks.length === 0 ? (
-          <View className="items-center justify-center py-12">
-            <View
-              style={{
-                width: 60,
-                height: 60,
-                borderRadius: 30,
-                backgroundColor: colors.bg.secondary,
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: 12,
-                ...shadows.md,
-              }}
-            >
-              <Ionicons name="briefcase-outline" size={28} color={colors.accent.primary} />
-            </View>
-            <Text
-              className="text-lg font-semibold"
-              style={{ color: colors.text.primary, fontFamily: 'DM Sans' }}
-            >
-              {searchQuery ? 'No stocks found' : 'No stocks added yet'}
-            </Text>
-            <Text
-              className="text-sm mt-2"
-              style={{ color: colors.text.secondary, fontFamily: 'Inter' }}
-            >
-              {searchQuery ? 'Try a different search' : 'Add your first stock to get started'}
-            </Text>
-          </View>
-        ) : (
-          <View className="pb-8">
-            {filteredStocks.map((stock) => (
-              <StockListItem
-                key={stock.id}
-                name={stock.name}
-                ticker={stock.ticker}
-                dateBought={stock.dateBought}
-                currentPrice={stock.currentPrice}
-                buyPrice={stock.buyPrice}
-                stock={stock}
-                onPress={() => handleOpenStockOptions(stock)}
-                onLongPress={() => handleOpenStockOptions(stock)}
-              />
-            ))}
-          </View>
-        )}
+      <ScrollView className="flex-1 px-4 py-4">
+        {filteredStocks.map((stock) => (
+          <StockListItem
+            key={stock.id}
+            name={stock.name}
+            ticker={stock.ticker}
+            dateBought={stock.dateBought}
+            currentPrice={stock.currentPrice}
+            buyPrice={stock.buyPrice}
+            stock={stock}
+            onPress={() =>
+              navigation.navigate("PersonalNews", {
+                screen: "PersonalNewsScreen",
+                params: { stock },
+              })
+            }
+            onLongPress={() => handleOpenStockOptions(stock)}
+          />
+        ))}
       </ScrollView>
 
       <AddStockModal
@@ -256,23 +221,10 @@ export default function StockListScreen() {
         onAdd={handleAddStock}
       />
 
-      <AddStockModal
-        visible={editMode && modalVisible}
-        mode="edit"
-        initialStockName={selectedStock?.name}
-        initialDateBought={selectedStock?.dateBought}
-        onClose={handleCloseAllModals}
-        onEdit={handleEditStockSave}
-        onAdd={() => {}}
-      />
-
       <StockOptionsModal
         visible={stockOptionsModalVisible}
-        stockName={selectedStock?.name || ''}
-        onClose={() => {
-          setStockOptionsModalVisible(false);
-          setSelectedStock(null);
-        }}
+        stockName={selectedStock?.name || ""}
+        onClose={() => setStockOptionsModalVisible(false)}
         onEdit={handleEditStock}
         onDelete={handleDeleteStock}
       />

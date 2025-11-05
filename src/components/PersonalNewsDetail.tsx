@@ -1,10 +1,11 @@
-import React, { useEffect, useState } from 'react';
-import { View, Text, ScrollView } from 'react-native';
-import { colors, shadows } from '../utils/theme';
-import axios from 'axios';
+import React, { useEffect, useState } from "react";
+import { View, Text, ScrollView } from "react-native";
+import { colors, shadows } from "../utils/theme";
+import axios from "axios";
+import Pdf from "react-native-pdf";
+import { WebView } from "react-native-webview";
 
-
-// const personalNewsObject = 
+// const personalNewsObject =
 //   {
 //     symbol: "TEAMLEASE",
 //     "desc": "Analysts/Institutional Investor Meet/Con. Call Updates",
@@ -27,8 +28,6 @@ import axios from 'axios';
 //     "attFileSize": "3.74 MB",
 //     "hasXbrl": true
 // }
-
-
 
 interface PersonalNewsDetailProps {
   nameOfStock: string;
@@ -68,9 +67,9 @@ export function PersonalNewsDetail({
   date,
   newsContent,
 }: PersonalNewsDetailProps) {
-  const [personalNewsObject, setPersonalNewsObject] = useState<ResponseObject[]>([]);
-
-  
+  const [personalNewsObject, setPersonalNewsObject] = useState<
+    ResponseObject[]
+  >([]);
 
   // useEffect(() => {
   //   axios.get('localhost:3000/api/announcements/TCS')
@@ -80,28 +79,30 @@ export function PersonalNewsDetail({
   //     })
   //     .catch(err => console.error("Error fetching:", err));
   // }, []);
-  
+
   useEffect(() => {
     console.log(" useEffect triggered");
 
     async function fetchResponse() {
       try {
-        const response = await axios.get('http://localhost:3000/api/announcements/TCS');
+        const response = await axios.get(
+          "http://192.168.29.16:3000/api/announcements/TCS"
+        );
         console.log("Response data:", response.data);
-        setPersonalNewsObject(Array.isArray(response.data) ? response.data : [response.data]);
+        setPersonalNewsObject(
+          Array.isArray(response.data) ? response.data : [response.data]
+        );
       } catch (error) {
         console.error("Axios error:", error);
       } finally {
         console.log("useEffect completed");
-      }      
+      }
     }
-  
+
     fetchResponse();
   }, []);
-  
 
-  console.log("personalNewsObject", personalNewsObject)
-  
+  console.log("personalNewsObject", personalNewsObject);
 
   return (
     <ScrollView
@@ -118,14 +119,14 @@ export function PersonalNewsDetail({
               borderColor: colors.accent.teal,
               borderWidth: 1.5,
               ...shadows.lg,
-            }
+            },
           ]}
         >
           <View
             style={{
-              display: 'flex',
-              flexDirection: 'row',
-              alignItems: 'center',
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
               gap: 8,
               marginBottom: 12,
             }}
@@ -141,7 +142,7 @@ export function PersonalNewsDetail({
               {/* SYMBOL */}
               <Text
                 className="text-xs font-semibold"
-                style={{ color: colors.bg.primary, fontFamily: 'Poppins' }}
+                style={{ color: colors.bg.primary, fontFamily: "Poppins" }}
               >
                 {/* {ticker}   */}
                 {personalNewsObject[0]?.symbol}
@@ -150,7 +151,7 @@ export function PersonalNewsDetail({
             {/* stock name  */}
             <Text
               className="text-sm font-semibold"
-              style={{ color: colors.accent.tealLight, fontFamily: 'Poppins' }}
+              style={{ color: colors.accent.tealLight, fontFamily: "Poppins" }}
             >
               {/* {nameOfStock} */}
               {personalNewsObject[0]?.sm_name}
@@ -159,7 +160,7 @@ export function PersonalNewsDetail({
 
           <Text
             className="text-2xl font-bold mb-3"
-            style={{ color: colors.text.primary, fontFamily: 'Poppins' }}
+            style={{ color: colors.text.primary, fontFamily: "Poppins" }}
           >
             {/* {headline} */}
             {personalNewsObject[0]?.desc}
@@ -167,10 +168,10 @@ export function PersonalNewsDetail({
 
           <Text
             className="text-xs mb-5"
-            style={{ color: colors.text.tertiary, fontFamily: 'Poppins' }}
+            style={{ color: colors.text.tertiary, fontFamily: "Poppins" }}
           >
             {/* {new Date(date).toLocaleDateString()} */}
-            {/* {newsDate} */}  DATE
+            {/* {newsDate} */} DATE
           </Text>
 
           <View
@@ -187,13 +188,26 @@ export function PersonalNewsDetail({
               style={{
                 color: colors.text.secondary,
                 lineHeight: 24,
-                fontFamily: 'Poppins',
+                fontFamily: "Poppins",
               }}
             >
               {/* {newsContent} */}
               {personalNewsObject[0]?.attchmntText}
             </Text>
           </View>
+          {personalNewsObject[0]?.attchmntFile ? (
+            <View style={{ height: 500, borderRadius: 8, overflow: "hidden" }}>
+              <WebView
+                source={{ uri: personalNewsObject[0].attchmntFile }}
+                style={{ flex: 1 }}
+                originWhitelist={["*"]}
+              />
+            </View>
+          ) : (
+            <Text style={{ color: colors.text.tertiary }}>
+              No PDF attachment available.
+            </Text>
+          )}
         </View>
       </View>
     </ScrollView>

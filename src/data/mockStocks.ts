@@ -2,11 +2,13 @@ export interface Stock {
   id: string;
   name: string;
   ticker: string;
+  symbol?: string; // optional if not always present
   dateBought: string;
   currentPrice: number;
   buyPrice: number;
   quantity: number;
 }
+
 
 export const defaultMockStocks: Stock[] = [
   {

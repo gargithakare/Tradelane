@@ -4,13 +4,24 @@ import { Ionicons } from '@expo/vector-icons';
 import '../global.css';
 import { useNavigation, useRoute } from '@react-navigation/native';
 import { PersonalNewsDetail } from '../src/components/PersonalNewsDetail';
-import { NewsItem } from '../src/data/mockNews';
 import { colors, shadows } from '../src/utils/theme';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+type NewsDetail = {
+  nameOfStock: string;
+  ticker: string;
+  headline: string;
+  date: string;
+  newsContent: string;
+};
+
 
 export default function PersonalNewsDetailScreen() {
   const navigation = useNavigation<any>();
   const route = useRoute<any>();
-  const { news } = route.params as { news: NewsItem };
+  const { news } = route.params as { news: NewsDetail };
+
+  const queryClient = new QueryClient();
+
 
   return (
     <SafeAreaView
@@ -38,6 +49,7 @@ export default function PersonalNewsDetailScreen() {
         <View />
       </View>
 
+      <QueryClientProvider client={queryClient}>
       <PersonalNewsDetail
         nameOfStock={news.nameOfStock}
         ticker={news.ticker}
@@ -45,6 +57,8 @@ export default function PersonalNewsDetailScreen() {
         date={news.date}
         newsContent={news.newsContent}
       />
+       </QueryClientProvider>
+
     </SafeAreaView>
   );
 }

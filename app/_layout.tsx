@@ -12,14 +12,13 @@ import { colors } from '../src/utils/theme';
 const Stack = createNativeStackNavigator();
 const Tab = createBottomTabNavigator();
 
+// 📈 Stack for "Stocks" tab
 function StockListStack() {
   return (
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        cardStyle: { backgroundColor: colors.bg.primary },
-        animationEnabled: true,
-        animationTypeForReplace: 'pop',
+        contentStyle: { backgroundColor: colors.bg.primary },
         gestureEnabled: true,
       }}
     >
@@ -28,14 +27,13 @@ function StockListStack() {
   );
 }
 
+// 📰 Stack for "News" tab
 function PersonalNewsStack() {
   return (
     <Stack.Navigator
       screenOptions={{
         headerShown: false,
-        cardStyle: { backgroundColor: colors.bg.primary },
-        animationEnabled: true,
-        animationTypeForReplace: 'pop',
+        contentStyle: { backgroundColor: colors.bg.primary },
         gestureEnabled: true,
       }}
     >
@@ -45,6 +43,7 @@ function PersonalNewsStack() {
   );
 }
 
+// 🧭 Root tab layout
 export default function RootLayout() {
   return (
     <Tab.Navigator

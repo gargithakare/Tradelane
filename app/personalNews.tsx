@@ -1,165 +1,124 @@
-import { useNavigation } from '@react-navigation/native';
-import React, { useEffect, useState } from 'react';
-import { Pressable, SafeAreaView, ScrollView, Text, View } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import '../global.css';
-import { mockNewsData } from '../src/data/mockNews';
-import { defaultMockStocks } from '../src/data/mockStocks';
-import { getStoredStocks } from '../src/utils/asyncStorage';
-import { colors, shadows } from '../src/utils/theme';
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+} from "react-native";
+import axios from "axios";
+import { useRoute, useNavigation, RouteProp } from "@react-navigation/native";
+import type { StackNavigationProp } from "@react-navigation/stack";
+import { colors, shadows } from "../src/utils/theme";
+import type { PersonalNewsStackParamList } from "./myStocks";
+
+type PersonalNewsRouteProp = RouteProp<
+  PersonalNewsStackParamList,
+  "PersonalNewsScreen"
+>;
+type PersonalNewsNavigationProp = StackNavigationProp<
+  PersonalNewsStackParamList,
+  "PersonalNewsScreen"
+>;
+
+interface NewsItem {
+  desc: string;
+  dt: string;
+  attchmntFile?: string;
+}
+
+const staticNewsData: NewsItem[] = [
+  {
+    desc: "Analysts/Investor Meet/Conference Call Updates",
+    dt: "20251025",
+    attchmntFile: "https://example.com/report1.pdf",
+  },
+  {
+    desc: "Quarterly Results Announcement for Q2 2025",
+    dt: "20251018",
+    attchmntFile: "https://example.com/report2.pdf",
+  },
+  {
+    desc: "Company releases ESG sustainability report",
+    dt: "20250928",
+    attchmntFile: "",
+  },
+];
 
 export default function PersonalNewsScreen() {
-  const [personalNews, setPersonalNews] = useState(mockNewsData);
-  const [isLoading, setIsLoading] = useState(true);
-  const navigation = useNavigation<any>();
+  const route = useRoute<PersonalNewsRouteProp>();
+  const navigation = useNavigation<PersonalNewsNavigationProp>();
+  const { stock } = route.params;
+
+  const [personalNews, setPersonalNews] = useState<NewsItem[]>([]);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    filterPersonalNews();
-  }, []);
+    const fetchPersonalNews = async () => {
+      try {
+        const response = await axios.get(
+          `http://localhost:3000/api/announcements/${stock.ticker}`
+        );
+        const data = Array.isArray(response.data)
+          ? response.data
+          : [response.data];
+        setPersonalNews(data);
+      } catch {
+        setPersonalNews(staticNewsData);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchPersonalNews();
+  }, [stock.ticker]);
 
-  const filterPersonalNews = async () => {
-    setIsLoading(true);
-    const storedStocks = await getStoredStocks();
-    const stocks = storedStocks.length > 0 ? storedStocks : defaultMockStocks;
-
-    const stockTickers = stocks.map((s) => s.ticker);
-    const filtered = mockNewsData.filter((news) =>
-      stockTickers.some((ticker) => news.ticker === ticker)
-    );
-
-    setPersonalNews(filtered.length > 0 ? filtered : mockNewsData.slice(0, 3));
-    setIsLoading(false);
-  };
-
-  const handleNewsPress = (newsId: string) => {
-    const news = mockNewsData.find((n) => n.id === newsId);
-    if (news) {
-      navigation.navigate('PersonalNewsDetailScreen', { news });
-    }
-  };
-
-  return (
-    <SafeAreaView
-      className="flex-1"
-      style={{ backgroundColor: colors.bg.primary }}
-    >
-      <View
-        style={{
-          height: 120,
-          backgroundColor: colors.bg.secondary,
-          paddingHorizontal: 16,
-          paddingTop: 20,
-          paddingBottom: 16,
-          borderBottomColor: colors.border.default,
-          borderBottomWidth: 1,
-          ...shadows.lg,
-        }}
-      >
-        <Text
-          className="text-4xl font-bold"
-          style={{ color: colors.text.primary, fontFamily: 'DM Sans' }}
-        >
-          Personal News
-        </Text>
-        <Text
-          className="text-sm mt-2"
-          style={{ color: colors.accent.hover, fontFamily: 'Inter' }}
-        >
-          Updates for your stocks
+  if (loading)
+    return (
+      <View className="flex-1 items-center justify-center bg-white">
+        <ActivityIndicator size="large" color={colors.accent.teal} />
+        <Text className="mt-4 text-gray-600">
+          Fetching news for {stock.ticker}...
         </Text>
       </View>
+    );
 
-      <ScrollView className="flex-1 px-4 py-4" showsVerticalScrollIndicator={false}>
-        <View className="pb-8">
-          {isLoading ? (
-            <View className="items-center justify-center py-8">
-              <Text style={{ color: colors.text.muted, fontFamily: 'Inter' }}>Loading news...</Text>
-            </View>
-          ) : personalNews.length === 0 ? (
-            <View className="items-center justify-center py-12">
-              <View
-                style={{
-                  width: 60,
-                  height: 60,
-                  borderRadius: 30,
-                  backgroundColor: colors.bg.secondary,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  marginBottom: 12,
-                  ...shadows.md,
-                }}
-              >
-                <Ionicons name="newspaper-outline" size={28} color={colors.accent.primary} />
-              </View>
-              <Text
-                className="text-lg font-semibold"
-                style={{ color: colors.text.primary, fontFamily: 'DM Sans' }}
-              >
-                No personalized news
-              </Text>
-              <Text
-                className="text-sm mt-2"
-                style={{ color: colors.text.secondary, fontFamily: 'Inter' }}
-              >
-                Add stocks to see relevant news updates
-              </Text>
-            </View>
-          ) : (
-            personalNews.map((news) => (
-              <Pressable
-                key={news.id}
-                onPress={() => handleNewsPress(news.id)}
-                style={({ pressed }) => ({
-                  opacity: pressed ? 0.8 : 1,
-                })}
-                className="mb-4"
-              >
-                <View
-                  className="rounded-lg p-5 border"
-                  style={[
-                    {
-                      backgroundColor: colors.bg.secondary,
-                      borderColor: colors.border.default,
-                      borderWidth: 1,
-                      ...shadows.lg,
-                    }
-                  ]}
-                >
-                  <View style={{ marginBottom: 8 }}>
-                    <View
-                      style={{
-                        width: 4,
-                        height: 4,
-                        borderRadius: 2,
-                        backgroundColor: colors.accent.primary,
-                        marginBottom: 8,
-                      }}
-                    />
-                  </View>
-                  <Text
-                    className="text-sm font-semibold mb-2"
-                    style={{ color: colors.accent.hover, fontFamily: 'Inter' }}
-                  >
-                    {news.nameOfStock}
-                  </Text>
-                  <Text
-                    className="text-base font-semibold mb-2"
-                    style={{ color: colors.text.primary, fontFamily: 'DM Sans' }}
-                  >
-                    {news.headline}
-                  </Text>
-                  <Text
-                    className="text-xs"
-                    style={{ color: colors.text.muted, fontFamily: 'Inter' }}
-                  >
-                    {new Date(news.date).toLocaleDateString()}
-                  </Text>
-                </View>
-              </Pressable>
-            ))
-          )}
-        </View>
-      </ScrollView>
-    </SafeAreaView>
+  return (
+    <ScrollView className="flex-1 px-5 pt-5">
+      <Text className="text-2xl font-bold mb-3 text-black">
+        {stock.name} News
+      </Text>
+
+      {personalNews.map((news, index) => (
+        <TouchableOpacity
+          key={index}
+          onPress={() =>
+            navigation.navigate("PersonalNewsDetailScreen", {
+              news: {
+                nameOfStock: stock.name,
+                ticker: stock.ticker,
+                headline: news.desc,
+                date: news.dt,
+                newsContent: news.attchmntFile || "No attachment available",
+              },
+            })
+          }
+        >
+          <View
+            className="mb-4 p-4 rounded-2xl"
+            style={{ backgroundColor: colors.bg.secondary, ...shadows.md }}
+          >
+            <Text className="text-base font-semibold text-black mb-1">
+              {news.desc}
+            </Text>
+            <Text className="text-sm text-gray-500 mb-2">{news.dt}</Text>
+            {news.attchmntFile ? (
+              <Text className="text-blue-500 underline">View Attachment</Text>
+            ) : (
+              <Text className="text-gray-500 italic">No attachment</Text>
+            )}
+          </View>
+        </TouchableOpacity>
+      ))}
+    </ScrollView>
   );
 }
